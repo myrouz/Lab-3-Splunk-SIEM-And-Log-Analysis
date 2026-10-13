@@ -1,39 +1,5 @@
 # Lab 3: Splunk SIEM and Log Analysis
 
-## 🎥 Walkthrough
-
-Follow along as I complete this lab! 
-
-<Insert Loom Link>
-
----
-
-## 📋 Overview
-
-
----
-
-## 🎯 Business Context
-
-
----
-
-## ✅ Prerequisites
-
-
----
-
-## 🧩 Architecture
-
-
----
-
-## 🛠️ Steps
-
-
-
-
-# Lab 3: Splunk SIEM & Log Analysis
  
 ![Splunk](https://img.shields.io/badge/Splunk-Enterprise-000000?logo=splunk&logoColor=white)
 ![Azure](https://img.shields.io/badge/Microsoft%20Azure-Free%20Account-0078D4?logo=microsoftazure&logoColor=white)
@@ -44,8 +10,13 @@ Follow along as I complete this lab!
 ![CySA+](https://img.shields.io/badge/CompTIA-CySA%2B-C8202F)
 ![Cost](https://img.shields.io/badge/Cost-%240-brightgreen)
 ![Time](https://img.shields.io/badge/Time-4--6%20hours-blue)
- 
-> Forward Windows Event Logs from an Active Directory domain controller into Splunk, then search, visualize, and alert on them the way a SOC analyst would.
+
+
+## 🎥 Walkthrough
+
+Follow along as I complete this lab! 
+
+<Insert Loom Link>
  
 ## Table of Contents
  
@@ -56,17 +27,22 @@ Follow along as I complete this lab!
 - [Validation and Troubleshooting](#validation-and-troubleshooting)
 - [Lessons Learned](#lessons-learned)
 - [Vocabulary](#vocabulary)
+
 ## 📋 Overview
 
-In this lab, a Windows Server VM from Lab 1 (the domain controller, DC01) forwards its logs to a separate Ubuntu VM running Splunk Enterprise. Splunk indexes the events and makes them searchable through the web UI, where I build searches, a dashboard, and an automated alert.
- 
-| Field | Value |
+In this lab, the Windows Server virtual machine (DC01), configured as the domain controller, forwards its event logs to a separate Ubuntu virtual machine running Splunk Enterprise. Splunk indexes the incoming events and makes them searchable through its web interface. Using this interface, I developed search queries, created a monitoring dashboard, and configured an automated alert to detect relevant events.
+
+| Skill | Real-world application |
 |---|---|
-| Certification alignment | CompTIA Security+ · CySA+ · Splunk Core Certified User |
-| Free tools | Splunk Enterprise (60-day trial, then permanently free at 500 MB/day) |
-| Time to complete | 4-6 hours across multiple sessions |
-| Estimated cost | $0 (Splunk Free licence covers everything in this lab) |
-| Career relevance | SOC Analyst (Tier 1-3) · Security Engineer · Incident Responder |
+| Deploy Splunk and configure a data input | Every Splunk deployment starts with getting data in. The Universal Forwarder is how most enterprises feed logs to Splunk. |
+| Navigate the Splunk interface | Search, dashboards, alerts, and reports are table stakes for any SOC role. |
+| Write SPL searches | SPL is how you ask Splunk questions, and it separates analysts who find threats from analysts who stare at dashboards. |
+| Build security dashboards | Visualize login failures over time, top source IPs, and failed authentication by user at a glance. |
+| Identify failed login attempts | One of the most common investigations: telling normal user error from a brute force attack. |
+| Build an automated alert | Splunk fires an alert when your conditions are met instead of waiting for a human to notice. |
+| Search for account lockout events | A trail of lockouts can indicate a password spray attack in progress. |
+
+> Forward Windows Event Logs from an Active Directory domain controller into Splunk, then search, visualize, and alert on them the way a SOC analyst would.
  
 ## 🧩 Architecture
  
@@ -81,15 +57,7 @@ flowchart TD
  
 ### What You Will Learn
  
-| Skill | Real-world application |
-|---|---|
-| Deploy Splunk and configure a data input | Every Splunk deployment starts with getting data in. The Universal Forwarder is how most enterprises feed logs to Splunk. |
-| Navigate the Splunk interface | Search, dashboards, alerts, and reports are table stakes for any SOC role. |
-| Write SPL searches | SPL is how you ask Splunk questions, and it separates analysts who find threats from analysts who stare at dashboards. |
-| Build security dashboards | Visualize login failures over time, top source IPs, and failed authentication by user at a glance. |
-| Identify failed login attempts | One of the most common investigations: telling normal user error from a brute force attack. |
-| Build an automated alert | Splunk fires an alert when your conditions are met instead of waiting for a human to notice. |
-| Search for account lockout events | A trail of lockouts can indicate a password spray attack in progress. |
+
  
 ## 🎯 Business Context
 
