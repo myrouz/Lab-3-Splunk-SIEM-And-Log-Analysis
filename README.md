@@ -264,10 +264,12 @@ Restart-Service SplunkForwarder
  
 </details>
 
- ## 🛠️ Steps
 
-### Step 2: Configure Data Inputs
+
+ ## 🛠️ Hands-On Steps
  
+<details>
+<summary><b>Step 1: Configure Data Inputs</b></summary>
 Splunk is only as useful as the data it receives. The first data source is the Active Directory / Windows Server VM from Lab 1.
  
 #### Part A: Enable receiving in Splunk
@@ -445,10 +447,11 @@ Write-Host '=============================================' -ForegroundColor Gree
 ```
  
 </details>
-Wait 60 seconds for the forwarder to ship the events. Then set the Splunk time range to **All Time** and run `index=windows_logs | head 100`. Events from the Security, System, and Application logs mean the lab is ready for Step 3.
+Wait 60 seconds for the forwarder to ship the events. Then set the Splunk time range to **All Time** and run `index=windows_logs | head 100`. Events from the Security, System, and Application logs mean the lab is ready for Step 2.
  
-### Step 3: Essential SPL Searches
- 
+</details>
+<details>
+<summary><b>Step 2: Essential SPL Searches</b></summary>
 Type searches into the **Search & Reporting** bar and choose a time range with the time picker on the right.
  
 **Confirm data is flowing**
@@ -457,7 +460,7 @@ Type searches into the **Search & Reporting** bar and choose a time range with t
 index=windows_logs | head 100
 ```
  
-- `index=windows_logs` searches only the index created in Step 2
+- `index=windows_logs` searches only the index created in Step 1
 - `| head 100` returns the first 100 events
 - If this returns nothing, check that the `SplunkForwarder` service is running on the Windows VM
 **Find successful logins (EventCode 4624)**
@@ -486,8 +489,11 @@ index=windows_logs sourcetype=WinEventLog:Security EventCode=4624
 - Human account names (no `$`) logging in after hours warrant review
 <!-- Add screenshot: after-hours logins search results -->
  
-### Step 4: Build a Security Dashboard
- 
+</details>
+
+
+<details>
+<summary><b>Step 3: Build a Security Dashboard</b></summary>
 Dashboards give a permanent view of security posture without rerunning searches.
  
 1. In Splunk, click **Dashboards** in the top navigation
@@ -539,8 +545,9 @@ index=windows_logs sourcetype=WinEventLog:Security EventCode=4624
  
 <!-- Add screenshot: Windows Security Overview dashboard with populated panels -->
  
-### Step 5: Create an Automated Alert
- 
+</details>
+<details>
+<summary><b>Step 4: Create an Automated Alert</b></summary>
 Alerts automate detection: Splunk runs a search on a schedule and notifies when conditions are met. First run this search to confirm it works:
  
 ```spl
@@ -561,6 +568,9 @@ This finds any account with more than 50 privileged logon events. EventCode 4672
 > Alert quality drives monitoring quality. An alert that fires too broadly causes alert fatigue, and one that is too narrow misses real threats. The threshold of 50 is a starting point; in a real environment it would be tuned over time based on false positives.
  
 <!-- Add screenshot: alert configuration page -->
+ 
+</details>
+
  
 ## Validation and Troubleshooting
  
@@ -600,6 +610,7 @@ This finds any account with more than 50 privileged logon events. EventCode 4672
 - **A fresh VM has little to detect.** Generating test activity (failed logons, a lockout, service restarts) is what makes searches, dashboards, and alerts demonstrable.
 - **Alert thresholds need tuning.** Too broad causes alert fatigue, too narrow misses threats, so start with a baseline and adjust on false positives.
 - **Stop VMs between sessions** to preserve free-tier credit.
+  
 ## Vocabulary
  
 | Term | Definition |
