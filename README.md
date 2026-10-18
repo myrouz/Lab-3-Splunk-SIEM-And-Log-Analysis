@@ -46,16 +46,9 @@ In this lab, the Windows Server virtual machine (DC01), configured as the domain
  
 ## 🧩 Architecture
  
-```mermaid
-flowchart TD
-    A["DC01: Windows Server VM (Lab 1)<br/>Security 4624 / 4625 / 4740, System, Application<br/>Universal Forwarder installed"] -->|"port 9997, encrypted"| B["Splunk Indexer<br/>Ubuntu 22.04, Standard_B2s<br/>windows_logs index"]
-    B -->|"parsed and stored"| C["Splunk Web UI<br/>http://VM-IP:8000<br/>SPL searches, dashboards, alerts"]
-    C -->|"browser, port 8000"| D["SOC Analyst<br/>local machine"]
-```
- 
-**NSG rules:** port 22 (SSH) and port 8000 (web UI) open to my IP only; port 9997 (forwarder) open to the VNet only.
- 
-### What You Will Learn
+<img width="995" height="1024" alt="Splunk SIEM   Log Architecture" src="https://github.com/user-attachments/assets/b30e0508-5df8-4136-9f07-91250de0f2c5" />
+
+> **NSG rules:** port 22 (SSH) and port 8000 (web UI) open to my IP only; port 9997 (forwarder) open to the VNet only.
  
 
  
