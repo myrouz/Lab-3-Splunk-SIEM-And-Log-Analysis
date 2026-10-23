@@ -22,7 +22,7 @@ Follow along as I complete this lab!
  
 - [Overview](#overview)
 - [Business Context](#business-context)
-- [Prerequisites](#prerequisites)
+- [Prerequisites/Configurations](#prerequisites)
 - [Hands-On Steps](#hands-on-steps)
 - [Validation and Troubleshooting](#validation-and-troubleshooting)
 - [Lessons Learned](#lessons-learned)
@@ -65,7 +65,7 @@ The SIEM is the security operations center's primary tool. When an alert fires, 
 | Cloud Security Engineer | Microsoft Sentinel and AWS Security Hub use the same SIEM concepts, and this lab teaches the mental model |
 | Incident Responder | Searching logs during an active incident, building a timeline of events, identifying scope of compromise |
  
-## ⚙️ Prerequisites
+## ⚙️ Prerequisites/Configurations
 
 <details>
 <summary><b>1. Deploy the Ubuntu VM</b></summary>
