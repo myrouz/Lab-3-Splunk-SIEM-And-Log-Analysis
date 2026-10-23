@@ -257,13 +257,9 @@ Restart-Service SplunkForwarder
  
 </details>
 
-
-
- ## 🛠️ Hands-On Steps
- 
 <details>
 <summary><b>Step 1: Configure Data Inputs</b></summary>
-Splunk is only as useful as the data it receives. The first data source is the Active Directory / Windows Server VM from Lab 1.
+Splunk is only as useful as the data it receives. The first data source is the Windows Server VM.
  
 #### Part A: Enable receiving in Splunk
  
@@ -437,12 +433,15 @@ Write-Host '=============================================' -ForegroundColor Gree
 Write-Host 'Done. Output saved to C:\lab3-log-output.txt' -ForegroundColor Green
 Write-Host 'Wait 60 seconds then search Splunk.' -ForegroundColor Green
 Write-Host '=============================================' -ForegroundColor Green
-```
- 
 </details>
+
 Wait 60 seconds for the forwarder to ship the events. Then set the Splunk time range to **All Time** and run `index=windows_logs | head 100`. Events from the Security, System, and Application logs mean the lab is ready for Step 2.
  
 </details>
+
+ ## 🛠️ Hands-On Steps
+ 
+
 <details>
 <summary><b>Step 2: Essential SPL Searches</b></summary>
 Type searches into the **Search & Reporting** bar and choose a time range with the time picker on the right.
@@ -484,15 +483,14 @@ index=windows_logs sourcetype=WinEventLog:Security EventCode=4624
  
 </details>
 
-
 <details>
 <summary><b>Step 3: Build a Security Dashboard</b></summary>
 Dashboards give a permanent view of security posture without rerunning searches.
  
-1. In Splunk, click **Dashboards** in the top navigation
-2. Click **Create New Dashboard** (top right)
-3. Set **Dashboard Title** to `Windows Security Overview`, leave **Description** blank, leave **Permissions** as Private, select **Classic Dashboards**, then click **Create** and **Create Dashboard**
-4. Click **Add Panel** for each panel below, choose **New Search**, paste the search, pick the visualization, and save
+a. In Splunk, click **Dashboards** in the top navigation
+b. Click **Create New Dashboard** (top right)
+c. Set **Dashboard Title** to `Windows Security Overview`, leave **Description** blank, leave **Permissions** as Private, select **Classic Dashboards**, then click **Create** and **Create Dashboard**
+d. Click **Add Panel** for each panel below, choose **New Search**, paste the search, pick the visualization, and save
 | Panel | Visualization |
 |---|---|
 | Account Activity (last 24h) | Bar chart |
@@ -539,6 +537,7 @@ index=windows_logs sourcetype=WinEventLog:Security EventCode=4624
 <!-- Add screenshot: Windows Security Overview dashboard with populated panels -->
  
 </details>
+
 <details>
 <summary><b>Step 4: Create an Automated Alert</b></summary>
 Alerts automate detection: Splunk runs a search on a schedule and notifies when conditions are met. First run this search to confirm it works:
@@ -551,19 +550,20 @@ index=windows_logs sourcetype=WinEventLog:Security EventCode=4672
  
 This finds any account with more than 50 privileged logon events. EventCode 4672 fires when admin-level rights are assigned at logon. Then:
  
-1. Click **Save As → Alert**
-2. **Name:** `High Privileged Logon Count`
-3. **Alert type:** Scheduled
-4. **Run every:** 15 minutes, using **Cron Schedule** with `*/15 * * * *`
-5. **Trigger condition:** Number of Results is greater than 0
-6. **Trigger actions:** Add to Triggered Alerts. This logs each firing, with a timestamp and result count, to **Activity → Triggered Alerts**, and needs no email or ticketing integration.
-7. Click **Save**
+a. Click **Save As → Alert**
+b. **Name:** `High Privileged Logon Count`
+c. **Alert type:** Scheduled
+d. **Run every:** 15 minutes, using **Cron Schedule** with `*/15 * * * *`
+e. **Trigger condition:** Number of Results is greater than 0
+f. **Trigger actions:** Add to Triggered Alerts. This logs each firing, with a timestamp and result count, to **Activity → Triggered Alerts**, and needs no email or ticketing integration.
+g. Click **Save**
 > Alert quality drives monitoring quality. An alert that fires too broadly causes alert fatigue, and one that is too narrow misses real threats. The threshold of 50 is a starting point; in a real environment it would be tuned over time based on false positives.
  
 <!-- Add screenshot: alert configuration page -->
  
 </details>
 
+</details>
  
 ## Validation and Troubleshooting
  
