@@ -65,7 +65,7 @@ The SIEM is the security operations center's primary tool. When an alert fires, 
 | Cloud Security Engineer | Microsoft Sentinel and AWS Security Hub use the same SIEM concepts, and this lab teaches the mental model |
 | Incident Responder | Searching logs during an active incident, building a timeline of events, identifying scope of compromise |
  
-## ✅ Prerequisites
+## ⚙️ Prerequisites
 
 <details>
 <summary><b>1. Deploy the Ubuntu VM</b></summary>
@@ -480,28 +480,39 @@ Events from the Security, System, and Application logs mean the lab is ready for
 
 <details>
 <summary><b>Step 1: Essential SPL Searches</b></summary>
+ 
 Type searches into the **Search & Reporting** bar and choose a time range with the time picker on the right.
  
-**Confirm data is flowing**
+**a. Confirm Data Flow**
  
 ```spl
 index=windows_logs | head 100
 ```
  
-- `index=windows_logs` searches only the index created in Step 1
-- `| head 100` returns the first 100 events
-- If this returns nothing, check that the `SplunkForwarder` service is running on the Windows VM
-**Find successful logins (EventCode 4624)**
- 
+**What it does:** Filters events strictly within the target index and limits the return to the first 100 results.
+
+ **Why it is important:**
+
+   Pipeline Health Check: This is the ultimate "smoke test" for the log ingestion pipeline. It proves that the Windows Universal Forwarder is capturing logs, transmitting them over TCP port 9997, and that the Ubuntu Splunk receiver is actively parsing and writing them to disk.
+
+   Troubleshooting: If this query returns zero results, it immediately indicates a breakdown in the chain—such as a stopped SplunkForwarder service, a blocked firewall port, or an incorrect index name configuration.
+
+**b. Find Successful Logins**
 ```spl
 index=windows_logs sourcetype=WinEventLog:Security EventCode=4624
 | stats count by Account_Name
 | sort -count
 ```
+
+**What it does:** Isolates Windows Security Event ID 4624 (successful logons), aggregates them by user account, and sorts them from highest to lowest volume.
+
+**Why it is important:**
+
+Baseline Behavior Analysis: In a SOC role, you must first understand what "normal" looks like before you can spot anomalies. This query gives an immediate overview of which user accounts and service accounts are actively authenticating across your systems.
+
+Noise Reduction & Auditing: It helps differentiate between noisy background service accounts and standard user logins, allowing analysts to quickly spot unexpected accounts authenticating into the environment.
  
-Counts successful logons per account, highest first.
- 
-**Detect after-hours logins**
+**c. Detect After-Hours Logins**
  
 ```spl
 index=windows_logs sourcetype=WinEventLog:Security EventCode=4624
@@ -511,16 +522,19 @@ index=windows_logs sourcetype=WinEventLog:Security EventCode=4624
 | sort -_time
 ```
  
-- `eval hour=strftime(_time, "%H")` extracts the hour from each timestamp
-- `where hour < 7 OR hour > 19` keeps only events outside 7 am-7 pm
-- Account names ending in `$` are computer accounts, which are normal and expected
-- Human account names (no `$`) logging in after hours warrant review
-<!-- Add screenshot: after-hours logins search results -->
+**What it does:** Filters for successful logons (4624), extracts the hour of the event using time evaluation functions (eval), and filters for events occurring outside of standard business hours (before 7:00 AM or after 7:00 PM).
+
+**Why it is important:**
+
+Threat Detection & IOCs: Unauthorized access outside of standard operational windows is a classic Indicator of Compromise (IOC). Attackers often attempt to move laterally or access systems at night when administrative oversight is lower.
+
+SOC Alert Foundation: This type of logic forms the basis of automated security alerts and correlation rules, helping analysts catch anomalous user activity or potential insider threats early.
  
 </details>
 
 <details>
 <summary><b>Step 2: Build a Security Dashboard</b></summary>
+ 
 Dashboards give a permanent view of security posture without rerunning searches.
  
 a. In Splunk, click **Dashboards** in the top navigation
