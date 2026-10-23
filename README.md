@@ -255,49 +255,70 @@ Restart-Service SplunkForwarder
  
 > **Best practice:** Put all lab VMs in one shared VNet from the start (for example `lab-vnet`, 10.0.0.0/16) with a subnet per environment (10.0.1.0/24 for AD, 10.0.2.0/24 for Splunk). The VMs then communicate freely, NSG rules are managed at the subnet level, and no peering is needed.
  
+
 </details>
 
 <details>
 <summary><b>7. Configure Data Inputs</b></summary>
+
+<br>
+
 Splunk is only as useful as the data it receives. The first data source is the Windows Server VM.
- 
-#### Part A: Enable receiving in Splunk
- 
-Run this on the Splunk web UI (`http://<YOUR_VM_PUBLIC_IP>:8000`) before installing the forwarder.
- 
+
+<details>
+<summary><b>Part A: Enable receiving in Splunk</b></summary>
+
+<br>
+
+Do this in the Splunk web UI (`http://<YOUR_VM_PUBLIC_IP>:8000`) before installing the forwarder.
+
 1. Log into the Splunk web UI
 2. Click **Settings → Forwarding and Receiving**
 3. Click **Configure Receiving → New Receiving Port**, enter `9997`, and click **Save**
-4. Click **Settings → Indexes → Create New Index**, name it `windows_logs`, and click **Save**
-   
-#### Part B: Install the Universal Forwarder on the Windows Server VM
- 
+4. Click **Settings → Indexes → New Index**, name it `windows_logs`, and click **Save**
+
+<!-- Add screenshot: Settings > Forwarding and Receiving showing port 9997 enabled -->
+
+</details>
+
+<details>
+<summary><b>Part B: Install the Universal Forwarder on the Windows Server VM</b></summary>
+
+<br>
+
 Do this on the **Windows Server VM**, not the Ubuntu VM.
- 
+
 1. On the Windows VM, open a browser and go to [splunk.com/en_us/download/universal-forwarder.html](https://www.splunk.com/en_us/download/universal-forwarder.html), and log in with the same Splunk account used for the Enterprise download
 2. Download the **Windows 64-bit** `.msi` installer (the page also lists 32-bit and ARM versions)
 3. Run the installer and work through the screens:
-| Screen | What to enter |
-|---|---|
-| Default Installation Options | Check the license box and select **An on-premises Splunk Enterprise instance**. Do **not** select Splunk Cloud, because that skips the Receiving Indexer screen and the forwarder has nowhere to send data. |
-| Administrator credentials | Username `admin`, uncheck **Generate random password**, set a password and save it for CLI commands later |
-| Deployment Server | **Leave completely blank.** Entering the Splunk VM IP here makes the forwarder phone home to the wrong address and no data flows. |
-| Receiving Indexer | The Splunk VM's **private IP** and port **9997** (for example `10.2.0.4:9997`) |
+
+   | Screen | What to enter |
+   |---|---|
+   | Default Installation Options | Check the license box and select **An on-premises Splunk Enterprise instance**. Do **not** select Splunk Cloud, because that skips the Receiving Indexer screen and the forwarder has nowhere to send data. |
+   | Administrator credentials | Username `admin`, uncheck **Generate random password**, set a password and save it for CLI commands later |
+   | Deployment Server | **Leave completely blank.** Entering the Splunk VM IP here makes the forwarder phone home to the wrong address and no data flows. |
+   | Receiving Indexer | The Splunk VM's **private IP** and port **9997** (for example `10.2.0.4:9997`) |
+
 4. Click **Install** (about 30 seconds), then **Finish**
 
-#### Part C: Configure `inputs.conf`
- 
+</details>
+
+<details>
+<summary><b>Part C: Configure <code>inputs.conf</code></b></summary>
+
+<br>
+
 `inputs.conf` tells the forwarder which Windows Event Logs to collect. The path must be exact:
- 
+
 ```text
 C:\Program Files\SplunkUniversalForwarder\etc\system\local\inputs.conf
 ```
- 
+
 Visual Studio Code is the easiest editor for this. Install it on the Windows VM from [code.visualstudio.com](https://code.visualstudio.com), then right-click the shortcut and choose **Run as Administrator** so it can save into Program Files. Create the `local` folder in Windows Explorer first if it does not exist, open it in VS Code with **File → Open Folder**, create a file named `inputs.conf`, paste the configuration below, and save with `Ctrl+S`.
- 
+
 ```ini
 # Each section in square brackets defines one log source to collect
- 
+
 [WinEventLog://Security]
 # Authentication events: logins, failures, lockouts
 disabled = 0
@@ -308,61 +329,65 @@ current_only = 0
 evt_resolve_ad_obj = 1
 # Required: without this line data goes to the main index, not windows_logs
 index = windows_logs
- 
+
 [WinEventLog://System]
 # OS-level events: service starts and stops, driver failures
 disabled = 0
 index = windows_logs
- 
+
 [WinEventLog://Application]
 # Events from installed applications
 disabled = 0
 index = windows_logs
 ```
- 
+
 Restart the forwarder to apply the changes (Administrator PowerShell on the Windows VM):
- 
+
 ```powershell
 Restart-Service SplunkForwarder
 ```
- 
+
 > Splunk also ships with built-in sample data (**Search → Data Summary**), which can be used for most search exercises while Lab 1 is still being built.
- 
-<!-- Add screenshot: Settings > Forwarding and Receiving showing port 9997 enabled -->
- 
-#### Part D: Generate test log data
- 
+
+</details>
+
+<details>
+<summary><b>Part D: Generate test log data</b></summary>
+
+<br>
+
 A fresh Windows Server VM has mostly empty logs, so generate activity before running the searches. The script creates a temporary local user (`labtest.user`), generates failed and successful logins, service restarts, application events, and an account lockout, then deletes the user. It only creates events in the Windows Event Log; nothing is changed permanently.
- 
+
 Open **PowerShell as Administrator** on the Windows VM and run the whole script (about 60-90 seconds).
- 
+
 <details>
 <summary><b>Click to expand: log generator script</b></summary>
+
 ```powershell
 # Lab 3 Log Generator - run as Administrator on the Windows VM
 # Output saved to C:\lab3-log-output.txt
 # Lab-only throwaway credentials; the test account is deleted at the end
- 
+
 $logFile = 'C:\lab3-log-output.txt'
 $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
- 
+
 function Log($message, $color = 'White') {
     Write-Host $message -ForegroundColor $color
     Add-Content -Path $logFile -Value "[$timestamp] $message"
 }
- 
+
 # Clear any previous run output
 if (Test-Path $logFile) { Remove-Item $logFile }
 Add-Content -Path $logFile -Value "Lab 3 Log Generator - Run started at $timestamp"
 Add-Content -Path $logFile -Value '============================================='
 Log 'Starting log generation...' Green
- 
+
 # Create a temporary test user account
 $testUser = 'labtest.user'
 $testPass = ConvertTo-SecureString 'TempPass123!' -AsPlainText -Force
 New-LocalUser -Name $testUser -Password $testPass -Description 'Splunk lab test account' -ErrorAction SilentlyContinue
 Log "Created test user: $testUser" Gray
- 
+
 # Failed logon attempts (Security log activity)
 Log 'Generating failed logon attempts (Security log activity)...' Yellow
 $wrongPass = ConvertTo-SecureString 'WrongPassword!' -AsPlainText -Force
@@ -372,14 +397,14 @@ $wrongPass = ConvertTo-SecureString 'WrongPassword!' -AsPlainText -Force
     Start-Sleep -Milliseconds 500
 }
 Log '  Generated 15 failed logon attempts' Gray
- 
+
 # Successful login (Event ID 4624)
 Log 'Generating successful login event (4624)...' Yellow
 $correctPass = ConvertTo-SecureString 'TempPass123!' -AsPlainText -Force
 $cred = New-Object System.Management.Automation.PSCredential($testUser, $correctPass)
 Start-Process -FilePath 'cmd.exe' -Credential $cred -ArgumentList '/c whoami' -Wait -ErrorAction SilentlyContinue
 Log '  Generated successful login (Event ID 4624)' Gray
- 
+
 # Service start/stop events (Event ID 7036)
 Log 'Generating service events (7036)...' Yellow
 $services = @('Spooler', 'Schedule', 'Netlogon')
@@ -390,7 +415,7 @@ $services | ForEach-Object {
     Start-Sleep -Seconds 1
     Log "  Stopped and restarted service: $_" Gray
 }
- 
+
 # Application log entries
 Log 'Generating application log events...' Yellow
 $eventSource = 'SplunkLabTest'
@@ -403,7 +428,7 @@ if (-not [System.Diagnostics.EventLog]::SourceExists($eventSource)) {
     Start-Sleep -Milliseconds 300
 }
 Log '  Generated 5 application log entries (Event ID 1001)' Gray
- 
+
 # Lock out the test account (Event ID 4740)
 Log 'Generating account lockout event (4740)...' Yellow
 $badCred = ConvertTo-SecureString 'BadPass!' -AsPlainText -Force
@@ -413,31 +438,41 @@ $badCred = ConvertTo-SecureString 'BadPass!' -AsPlainText -Force
     Start-Sleep -Milliseconds 200
 }
 Log '  Account lockout triggered (Event ID 4740)' Gray
- 
+
 # Clean up the test account
 Start-Sleep -Seconds 3
 Remove-LocalUser -Name $testUser -ErrorAction SilentlyContinue
 Log "Removed test user: $testUser" Gray
- 
+
 # Restart the forwarder to ship events to Splunk
 Log 'Restarting forwarder to ship events to Splunk...' Yellow
 Restart-Service SplunkForwarder -ErrorAction SilentlyContinue
 Log '  SplunkForwarder restarted' Gray
- 
+
 $endTime = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
 Add-Content -Path $logFile -Value '============================================='
 Add-Content -Path $logFile -Value "Run completed at $endTime"
 Add-Content -Path $logFile -Value 'Wait 60 seconds then run: index=windows_logs | head 100'
- 
+
 Write-Host ''
 Write-Host '=============================================' -ForegroundColor Green
 Write-Host 'Done. Output saved to C:\lab3-log-output.txt' -ForegroundColor Green
 Write-Host 'Wait 60 seconds then search Splunk.' -ForegroundColor Green
 Write-Host '=============================================' -ForegroundColor Green
+```
+
 </details>
 
-Wait 60 seconds for the forwarder to ship the events. Then set the Splunk time range to **All Time** and run `index=windows_logs | head 100`. Events from the Security, System, and Application logs mean the lab is ready for Step 2.
- 
+Wait 60 seconds for the forwarder to ship the events. Then set the Splunk time range to **All Time** and run:
+
+```text
+index=windows_logs | head 100
+```
+
+Events from the Security, System, and Application logs mean the lab is ready for Step 2.
+
+</details>
+
 </details>
 
  ## 🛠️ Hands-On Steps
