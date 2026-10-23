@@ -480,6 +480,7 @@ Events from the Security, System, and Application logs mean the lab is ready for
 
 <details>
 <summary><b>Step 1: Essential SPL Searches</b></summary>
+
  
 Type searches into the **Search & Reporting** bar and choose a time range with the time picker on the right.
  
@@ -534,6 +535,7 @@ SOC Alert Foundation: This type of logic forms the basis of automated security a
 
 <details>
 <summary><b>Step 2: Build a Security Dashboard</b></summary>
+
  
 Dashboards give a permanent view of security posture without rerunning searches.
  
@@ -590,6 +592,8 @@ index=windows_logs sourcetype=WinEventLog:Security EventCode=4624
 
 <details>
 <summary><b>Step 3: Create an Automated Alert</b></summary>
+
+ 
 Alerts automate detection: Splunk runs a search on a schedule and notifies when conditions are met. First run this search to confirm it works:
  
 ```spl
