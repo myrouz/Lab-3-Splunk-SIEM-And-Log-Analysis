@@ -258,7 +258,7 @@ Restart-Service SplunkForwarder
 </details>
 
 <details>
-<summary><b>Step 1: Configure Data Inputs</b></summary>
+<summary><b>7. Configure Data Inputs</b></summary>
 Splunk is only as useful as the data it receives. The first data source is the Windows Server VM.
  
 #### Part A: Enable receiving in Splunk
@@ -269,6 +269,7 @@ Run this on the Splunk web UI (`http://<YOUR_VM_PUBLIC_IP>:8000`) before install
 2. Click **Settings → Forwarding and Receiving**
 3. Click **Configure Receiving → New Receiving Port**, enter `9997`, and click **Save**
 4. Click **Settings → Indexes → Create New Index**, name it `windows_logs`, and click **Save**
+   
 #### Part B: Install the Universal Forwarder on the Windows Server VM
  
 Do this on the **Windows Server VM**, not the Ubuntu VM.
@@ -282,8 +283,8 @@ Do this on the **Windows Server VM**, not the Ubuntu VM.
 | Administrator credentials | Username `admin`, uncheck **Generate random password**, set a password and save it for CLI commands later |
 | Deployment Server | **Leave completely blank.** Entering the Splunk VM IP here makes the forwarder phone home to the wrong address and no data flows. |
 | Receiving Indexer | The Splunk VM's **private IP** and port **9997** (for example `10.2.0.4:9997`) |
- 
 4. Click **Install** (about 30 seconds), then **Finish**
+
 #### Part C: Configure `inputs.conf`
  
 `inputs.conf` tells the forwarder which Windows Event Logs to collect. The path must be exact:
@@ -443,7 +444,7 @@ Wait 60 seconds for the forwarder to ship the events. Then set the Splunk time r
  
 
 <details>
-<summary><b>Step 2: Essential SPL Searches</b></summary>
+<summary><b>Step 1: Essential SPL Searches</b></summary>
 Type searches into the **Search & Reporting** bar and choose a time range with the time picker on the right.
  
 **Confirm data is flowing**
@@ -484,7 +485,7 @@ index=windows_logs sourcetype=WinEventLog:Security EventCode=4624
 </details>
 
 <details>
-<summary><b>Step 3: Build a Security Dashboard</b></summary>
+<summary><b>Step 2: Build a Security Dashboard</b></summary>
 Dashboards give a permanent view of security posture without rerunning searches.
  
 a. In Splunk, click **Dashboards** in the top navigation
@@ -539,7 +540,7 @@ index=windows_logs sourcetype=WinEventLog:Security EventCode=4624
 </details>
 
 <details>
-<summary><b>Step 4: Create an Automated Alert</b></summary>
+<summary><b>Step 3: Create an Automated Alert</b></summary>
 Alerts automate detection: Splunk runs a search on a schedule and notifies when conditions are met. First run this search to confirm it works:
  
 ```spl
