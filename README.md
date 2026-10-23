@@ -79,10 +79,10 @@ In the Azure portal, search **Virtual machines**, click **Create**, and use thes
 | Disk | 30 GB minimum |
 | Inbound NSG ports | 8000 (Splunk web UI), 9997 (forwarder input), 22 (SSH) |
 
-> 🔒 Inbound Network Security Group (NSG) Rules
-
+> **🔒 Inbound Network Security Group (NSG) Rules**
+> 
 > Allow-SplunkWebUI-MyIP (TCP/8000): Restricts access to the Splunk Web management interface strictly to my public IP address, preventing unauthorized external scanning and brute-force attacks while allowing dashboard management and SPL query execution.
-
+> 
 > Allow-SplunkForwarder-WindowsVM (TCP/9997): Permits secure log transmission from the Windows VM subnet to the Splunk receiver, overriding Azure's default deny-all policy to ensure continuous data ingestion.
 
 </details>
@@ -114,7 +114,15 @@ This is the same Windows Server VM built in Lab 1, which becomes DC01 and the lo
 </details>
 
 <details>
-<summary><b>3. SSH into the Linux VM</b></summary>
+<summary><b>3. Establish VNet Peering between Ubuntu VM and Windows VM</b></summary>
+
+<img width="1024" height="559" alt="VNet Peering" src="https://github.com/user-attachments/assets/30788453-7c61-4b86-a5df-d9dfc9e57123" />
+
+
+</details>
+
+<details>
+<summary><b>4. SSH into the Linux VM</b></summary>
 
 **Mac or Linux** (SSH is built in). Open Terminal.
 
@@ -133,27 +141,19 @@ ssh -i yourkey.pem <admin-username>@<YOUR_VM_PUBLIC_IP>
 
 Replace `<admin-username>` with the admin username set when creating the VM and `<YOUR_VM_PUBLIC_IP>` with the public IP from the Azure portal. Type `yes` at the host fingerprint prompt.
 
-**Windows** (PuTTY). Windows 10/11 also include an OpenSSH client, so the command above works in PowerShell too.
 
-1. Download the 64-bit Windows installer (.msi) from the [official PuTTY site](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html)
-2. Run the installer as Administrator with the default options
-3. Open PuTTY and enter the VM's public IP in **Host Name**, with **Port 22** and **Connection type SSH** (the defaults)
-4. Click **Open** and accept the host key security alert the first time
-5. Type the VM admin username and press Enter, then type the password and press Enter
-
-> Nothing appears on screen while typing a password in PuTTY, not even dots. This is normal Linux behavior. These steps assume password authentication. To use a `.pem` key with PuTTY, convert it with PuTTYgen first.
 
 </details>
 
 <details>
-<summary><b>4. Install and start Splunk (Commands 1-4)</b></summary>
+<summary><b>5. Install and start Splunk (Commands 1-4)</b></summary>
 
 Run these inside the SSH session, in order.
 
 **Command 1: Download the installer.** `wget` downloads a file, and `-O` sets the output filename.
 
 ```bash
-wget -O splunk-10.2.2-linux-amd64.deb "https://download.splunk.com/products/splunk/releases/10.2.2/linux/splunk-10.2.2-80b90d638de6-linux-amd64.deb"
+wget -O splunk-10.6.1.1-b2ae2962645c-linux-amd64.deb "https://download.splunk.com/products/splunk/releases/10.6.1.1/linux/splunk-10.6.1.1-b2ae2962645c-linux-amd64.deb"
 ```
 
 If this returns a 404, Splunk has released a newer version. Log into splunk.com, go to **Free Trials and Downloads**, select Linux `.deb`, and copy the `wget` command shown there.
@@ -161,7 +161,7 @@ If this returns a 404, Splunk has released a newer version. Log into splunk.com,
 **Command 2: Install the package.** `dpkg -i` installs the package into `/opt/splunk/`. A warning about a missing Python 3.7 path is expected and harmless on Ubuntu 22.04.
 
 ```bash
-sudo dpkg -i splunk-10.2.2-linux-amd64.deb
+sudo dpkg -i splunk-10.6.1.1-b2ae2962645c-linux-amd64.deb
 ```
 
 **Command 3: Start Splunk and accept the license.** `--run-as-root` is required on newer Splunk versions when running as root. You will be prompted to create an admin username and password for the web UI.
@@ -179,15 +179,13 @@ sudo /opt/splunk/bin/splunk enable boot-start
 </details>
 
 <details>
-<summary><b>5. Access the web UI</b></summary>
+<summary><b>6. Access the web UI</b></summary>
 
 Open this in a browser on the local machine, using the public IP from the VM's **Overview** page in the Azure portal:
 
 ```text
 http://<YOUR_VM_PUBLIC_IP>:8000
 ```
-
-</details>
  
 #### If the browser shows "This site can't be reached"
  
