@@ -66,8 +66,6 @@ The SIEM is the security operations center's primary tool. When an alert fires, 
 | Incident Responder | Searching logs during an active incident, building a timeline of events, identifying scope of compromise |
  
 ## ✅ Prerequisites
- 
-## Prerequisites
 
 <details>
 <summary><b>1. Deploy the Ubuntu VM</b></summary>
@@ -81,7 +79,11 @@ In the Azure portal, search **Virtual machines**, click **Create**, and use thes
 | Disk | 30 GB minimum |
 | Inbound NSG ports | 8000 (Splunk web UI), 9997 (forwarder input), 22 (SSH) |
 
-Open ports **8000** and **22** to **my IP address only**. Open port **9997** to the **VNet address range only** (10.0.0.0/16 or similar) so only my other Azure VMs can send logs to it, not the public internet.
+> 🔒 Inbound Network Security Group (NSG) Rules
+
+> Allow-SplunkWebUI-MyIP (TCP/8000): Restricts access to the Splunk Web management interface strictly to my public IP address, preventing unauthorized external scanning and brute-force attacks while allowing dashboard management and SPL query execution.
+
+> Allow-SplunkForwarder-WindowsVM (TCP/9997): Permits secure log transmission from the Windows VM subnet to the Splunk receiver, overriding Azure's default deny-all policy to ensure continuous data ingestion.
 
 </details>
 
