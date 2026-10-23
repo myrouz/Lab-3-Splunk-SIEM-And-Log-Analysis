@@ -656,7 +656,7 @@ g. Click **Save**
 - **Every `inputs.conf` stanza needs its `index` setting.** Without it, events go to the default `main` index and searches against `windows_logs` come back empty.
 - **A fresh VM has little to detect.** Generating test activity (failed logons, a lockout, service restarts) is what makes searches, dashboards, and alerts demonstrable.
 - **Alert thresholds need tuning.** Too broad causes alert fatigue, too narrow misses threats, so start with a baseline and adjust on false positives.
-- **Stop VMs between sessions** to preserve free-tier credit.
+
   
 ## Vocabulary
  
