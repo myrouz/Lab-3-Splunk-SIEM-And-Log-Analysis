@@ -195,6 +195,7 @@ A timeout on port 8000 is almost always a missing NSG rule. Work through these c
  
 1. Go to portal.azure.com → your Splunk VM → **Networking → Inbound port rules**
 2. If no rule allows port 8000, click **Add inbound port rule** and set:
+   
 | Field | Value |
 |---|---|
 | Name | Allow-SplunkWebUI-MyIP |
