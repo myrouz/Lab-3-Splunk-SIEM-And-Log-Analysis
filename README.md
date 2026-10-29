@@ -17,21 +17,6 @@
 Follow along as I complete this lab! 
 
 [Loom Video: Splunk SIEM and Log Analysis Lab](https://www.loom.com/share/73ad5c648e6b4cf5b21741b42d2a606f)
- 
-## Table of Contents
- 
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [Business Context](#business-context)
-- [Prerequisites/Configurations](#prerequisites-configurations)
-- [Hands-On Steps](#hands-on-steps)
-- [Validation](#validation)
-- [Troubleshooting](#troubleshooting)
-- [Key Terms](#key-terms)
-- [Windows Event ID](#windows-event-id)
-- [Key Skills Demonstrated ](#key-skills-demonstrated)
-- [Lessons Learned](#lessons-learned)
-  
 
 ## 📋 Overview
 
