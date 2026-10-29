@@ -14,7 +14,7 @@
 
 ## 🎥 Walkthrough
 
-Follow along as I complete this lab! 
+Turn raw logs into powerful security insights and learn how to detect suspicious activity with Splunk!
 
 [Loom Video: Splunk SIEM and Log Analysis Lab](https://www.loom.com/share/73ad5c648e6b4cf5b21741b42d2a606f)
 
