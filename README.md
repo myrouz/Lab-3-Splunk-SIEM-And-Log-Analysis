@@ -622,8 +622,10 @@ g. Click **Save**
 <!-- Add screenshot: alert configuration page -->
  
 </details>
- 
-### ✅ Validation
+
+---
+
+## ✅ Validation
  
 | Check | How to verify |
 |---|---|
@@ -632,7 +634,7 @@ g. Click **Save**
 | Dashboard displays data | The Windows Security Overview dashboard shows populated panels with charts |
 | Alert is active | **Settings → Searches, Reports, and Alerts** lists the alert as Enabled |
  
-### 🛠️ Troubleshooting
+## 🛠️ Troubleshooting
  
 | Problem | Fix |
 |---|---|
@@ -664,7 +666,7 @@ g. Click **Save**
 | **NSG** (Network Security Group) | Azure firewall rules that control inbound and outbound traffic to a VM |
 | **VNet Peering** | An Azure networking feature that creates a direct private connection between separate Virtual Networks, enabling communication between VMs (such as the Forwarder and Indexer). |
  
-### 🔍 Windows Event IDs
+## 🔍 Windows Event IDs
  
 | EventCode | Meaning | Why it matters |
 |---|---|---|
