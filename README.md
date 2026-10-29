@@ -58,27 +58,7 @@ The SIEM is the security operations center's primary tool. When an alert fires, 
 ## ⚙️ Prerequisites/Configurations
 
 <details>
-<summary><b>1. Deploy the Ubuntu VM</b></summary>
-
-In the Azure portal, search **Virtual machines**, click **Create**, and use these settings:
-
-| Setting | Value |
-|---|---|
-| OS | Ubuntu 22.04 LTS (free tier eligible) |
-| Size | Standard_B2s (2 vCPU, 4 GB RAM minimum; Splunk requires at least 4 GB) |
-| Disk | 30 GB minimum |
-| Inbound NSG ports | 8000 (Splunk web UI), 9997 (forwarder input), 22 (SSH) |
-
-> **🔒 Inbound Network Security Group (NSG) Rules**
-> 
-> Allow-SplunkWebUI-MyIP (TCP/8000): Restricts access to the Splunk Web management interface strictly to my public IP address, preventing unauthorized external scanning and brute-force attacks while allowing dashboard management and SPL query execution.
-> 
-> Allow-SplunkForwarder-WindowsVM (TCP/9997): Permits secure log transmission from the Windows VM subnet to the Splunk receiver, overriding Azure's default deny-all policy to ensure continuous data ingestion.
-
-</details>
-
-<details>
-<summary><b>2. Deploy the Windows VM</b></summary>
+<summary><b>1. Deploy the Windows VM</b></summary>
 
 This is the same Windows Server VM built in Lab 1, which becomes DC01 and the log source for this lab.
 
@@ -101,13 +81,63 @@ This is the same Windows Server VM built in Lab 1, which becomes DC01 and the lo
 
 **Enable copy and paste over RDP.** Download the RDP file from the Azure portal (**Connect → Download RDP File**) and open it with the native Remote Desktop app. Before connecting, click **Show Options → Local Resources** and make sure **Clipboard** is checked. The browser-based console has very limited clipboard sharing.
 
+<img width="1256" height="648" alt="Windows VM Deployed" src="https://github.com/user-attachments/assets/cb1bd509-be8d-4491-9624-58af291a65d7" />
+
+>Windows test VM deployment complete. Deployed CreateVirtualMachine-testVM into the WindowsVM resource group. This Windows machine acts as the monitored endpoint, generating the event logs that are forwarded to the Splunk instance for ingestion, searching and alerting.
+
+</details>
+
+<details>
+<summary><b>2. Deploy the Ubuntu VM</b></summary>
+
+In the Azure portal, search **Virtual machines**, click **Create**, and use these settings:
+
+| Setting | Value |
+|---|---|
+| OS | Ubuntu 22.04 LTS (free tier eligible) |
+| Size | Standard_B2s (2 vCPU, 4 GB RAM minimum; Splunk requires at least 4 GB) |
+| Disk | 30 GB minimum |
+| Inbound NSG ports | 8000 (Splunk web UI), 9997 (forwarder input), 22 (SSH) 
+
+<img width="1402" height="596" alt="Ubuntu VM Deployed" src="https://github.com/user-attachments/assets/eb17f9c6-e6d9-4623-a358-b35b16920f4f" />
+
+>Splunk VM deployment complete. Provisioned the CreateVirtualMachine-SplunkVM deployment in the rg-splunk resource group through the Azure portal. This VM hosts the Splunk Enterprise instance used as the SIEM for the log monitoring lab. A dedicated resource group keeps the SIEM infrastructure isolated and easy to manage or tear down after the lab.
+
+
+**🔒 Inbound Network Security Group (NSG) Rules**
+
+<img width="1424" height="721" alt="Inbound NSG Rules" src="https://github.com/user-attachments/assets/b745fe60-0e8e-402b-908b-2b0858d19959" />
+
+> 
+> 
+> Allow-SplunkWebUI-MyIP (TCP/8000): Restricts access to the Splunk Web management interface strictly to my public IP address, preventing unauthorized external scanning and brute-force attacks while allowing dashboard management and SPL query execution.
+> 
+> Allow-SplunkForwarder-WindowsVM (TCP/9997): Permits secure log transmission from the Windows VM subnet to the Splunk receiver, overriding Azure's default deny-all policy to ensure continuous data ingestion.
+
+
 </details>
 
 <details>
 <summary><b>3. Establish VNet Peering between Ubuntu VM and Windows VM</b></summary>
 
-<img width="1024" height="559" alt="VNet Peering" src="https://github.com/user-attachments/assets/30788453-7c61-4b86-a5df-d9dfc9e57123" />
+- a. Go to portal.azure.com → **Virtual Networks** → select the Splunk VM's VNet
+- b. Click **Peerings → Add**
+- c. Name the links: this VNet link `splunk-vnet-to-ad-vnet`, remote VNet link `ad-vnet-to-splunk-vnet`
+- d. Select “Allow virtual network access” is enabled in both directions, so the Windows machines can reach the Splunk server over private IPs.
+- e. Under **Remote virtual network**, select the Windows VM's VNet, leave other settings default, and click **Add**
+- f. Azure creates both directions; wait until both show **Connected**
+ 
+<img width="545" height="777" alt="VNet Peering Configuration" src="https://github.com/user-attachments/assets/e7631635-9d28-4640-a9d3-f4b81fc56014" />
 
+>Configuring VNet peering between the Splunk and AD networks. On the Add peering page for vnet-eastus-2, I created a bidirectional peering to vnet-eastus-1 (the WindowsVM resource group) in the same subscription. Both peering links are configured in a single step:
+
+<img width="1421" height="710" alt="Vnet Peering" src="https://github.com/user-attachments/assets/3fa2828d-9a23-474c-b9ca-d76256eddc45" />
+
+> VNet peering verified. The Peerings page for vnet-eastus-2 (the Splunk network) shows the link ad-vnet-to-splunk-vnet pointing to the remote network vnet-eastus-1 (the AD/Windows network).
+
+<img width="1024" height="710" alt="VNet Peering" src="https://github.com/user-attachments/assets/30788453-7c61-4b86-a5df-d9dfc9e57123" />
+
+> VNet peering: The two VNets use non-overlapping address spaces, which peering requires. Traffic flows in both directions over private IP connectivity.
 
 </details>
 
@@ -130,8 +160,6 @@ ssh -i yourkey.pem <admin-username>@<YOUR_VM_PUBLIC_IP>
 ```
 
 Replace `<admin-username>` with the admin username set when creating the VM and `<YOUR_VM_PUBLIC_IP>` with the public IP from the Azure portal. Type `yes` at the host fingerprint prompt.
-
-
 
 </details>
 
