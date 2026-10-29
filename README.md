@@ -21,12 +21,17 @@ Follow along as I complete this lab!
 ## Table of Contents
  
 - [Overview](#overview)
+- [Architecture](#architecture)
 - [Business Context](#business-context)
-- [Prerequisites/Configurations](#prerequisites)
+- [Prerequisites/Configurations](#prerequisites-configurations)
 - [Hands-On Steps](#hands-on-steps)
-- [Validation and Troubleshooting](#validation-and-troubleshooting)
+- [Validation](#validation)
+- [Troubleshooting](#troubleshooting)
+- [Key Terms](#key-terms)
+- [Windows Event ID](#windows-event-id)
+- [Key Skills Demonstrated ](#key-skills-demonstrated)
 - [Lessons Learned](#lessons-learned)
-- [Vocabulary](#vocabulary)
+  
 
 ## 📋 Overview
 
@@ -617,12 +622,8 @@ g. Click **Save**
 <!-- Add screenshot: alert configuration page -->
  
 </details>
-
-</details>
  
-## Validation and Troubleshooting
- 
-### Validation
+### ✅ Validation
  
 | Check | How to verify |
 |---|---|
@@ -631,7 +632,7 @@ g. Click **Save**
 | Dashboard displays data | The Windows Security Overview dashboard shows populated panels with charts |
 | Alert is active | **Settings → Searches, Reports, and Alerts** lists the alert as Enabled |
  
-### Troubleshooting
+### 🛠️ Troubleshooting
  
 | Problem | Fix |
 |---|---|
@@ -647,34 +648,23 @@ g. Click **Save**
 | `wget` returns 404 | Splunk released a newer version; copy the current `wget` command from the Splunk download page |
 | Cannot paste commands into the Windows VM | Use the downloaded RDP file in the native Remote Desktop app and enable Clipboard under **Local Resources** |
  
-## Lessons Learned
- 
-- **A missing NSG rule is the first suspect for a connection timeout.** Port 8000 for the web UI and port 9997 for the forwarder both need explicit rules.
-- **Scope network exposure tightly.** SSH and the web UI are limited to my IP, and the forwarder port is limited to the VNet.
-- **Azure public IPs change when a VM is stopped and restarted.** Setting the assignment to Static avoids chasing a new IP every session.
-- **Put all lab VMs in one VNet with a subnet per environment.** It avoids VNet peering and keeps NSG management simple.
-- **Leave the Deployment Server blank in the Universal Forwarder installer.** Pointing it at the Splunk VM sends the forwarder to the wrong place and no data flows.
-- **Every `inputs.conf` stanza needs its `index` setting.** Without it, events go to the default `main` index and searches against `windows_logs` come back empty.
-- **A fresh VM has little to detect.** Generating test activity (failed logons, a lockout, service restarts) is what makes searches, dashboards, and alerts demonstrable.
-- **Alert thresholds need tuning.** Too broad causes alert fatigue, too narrow misses threats, so start with a baseline and adjust on false positives.
 
-  
-## Vocabulary
- 
+## 📖 Key Terms
+
 | Term | Definition |
-|---|---|
-| **SIEM** (Security Information and Event Management) | A platform that collects logs from servers, workstations, firewalls, cloud services, and apps into one searchable place. Its two core jobs are correlation and alerting. |
-| **Correlation** | Connecting events across different systems to identify patterns that no single system would reveal alone |
-| **SPL** (Splunk Processing Language) | Splunk's query language, built as a pipeline: find the events, then pipe them through commands that filter, transform, and visualize |
-| **Index** | A named storage bucket for events, similar to a database table. Separate indexes allow separate retention, permissions, and storage per data source. This lab uses `windows_logs`. |
-| **Indexer** | The Splunk component that receives, parses, and stores incoming events (here, the Ubuntu VM) |
-| **Universal Forwarder** | A free, lightweight Splunk agent that compresses, encrypts, and sends logs to the indexer over port 9997 |
-| **`inputs.conf`** | Config file on the forwarder machine that defines which data sources to collect. Each `[bracketed]` section is one source. |
+| --- | --- |
+| **SIEM (Security Information and Event Management)** | A platform that collects log data from across an entire environment and makes it searchable in one place, providing event correlation and automated alerting.|
+| **SPL (Splunk Processing Language)** | The query language used in Splunk that works as a pipeline, allowing analysts to search, filter, transform, and visualise log data. |
+| **Index** | A named storage bucket in Splunk where events are kept, functioning similarly to a database table (e.g., `windows_logs`). |
+| **Universal Forwarder** | A lightweight agent installed on source machines (such as a Windows Server VM) to monitor, encrypt, and forward logs to a Splunk indexer over port 9997. |
+| **Windows Event IDs** | Unique numbers assigned by Windows to specific system activities, such as successful logons (`4624`), process creations (`4688`), or account lockouts (`4740`). |
+| **inputs.conf** | A configuration file used by the Universal Forwarder to specify which log sources and Windows Event Logs to collect. |
+| **Dashboard** | A permanent, visual display view in Splunk consisting of multiple panels (such as charts and event lists) based on saved SPL queries. |
+| **Alert** | An automated detection mechanism in Splunk that executes a search on a regular schedule and records or notifies when specific criteria are met. |
 | **NSG** (Network Security Group) | Azure firewall rules that control inbound and outbound traffic to a VM |
-| **VNet Peering** | A direct private connection between two Azure virtual networks, required for VMs in separate VNets to communicate |
-| **Alert fatigue** | Analysts ignoring alerts because too many fire, often from poorly tuned thresholds |
+| **VNet Peering** | An Azure networking feature that creates a direct private connection between separate Virtual Networks, enabling communication between VMs (such as the Forwarder and Indexer). |
  
-### Windows Event IDs used in this lab
+### 🔍 Windows Event IDs
  
 | EventCode | Meaning | Why it matters |
 |---|---|---|
@@ -684,5 +674,32 @@ g. Click **Save**
 | **4688** | New process created | Threat hunting for malicious execution |
 | **4740** | Account locked out | A trail of lockouts can indicate a password spray |
 | **7036** | Service entered a running or stopped state | Service start and stop activity |
+
+## 🛠️ Key Skills Demonstrated 
+
+**Splunk Deployment & Cloud Configuration:** Setting up and running Splunk Enterprise on an Azure Ubuntu virtual machine and configuring local firewall and networking rules.   
+
+**Universal Forwarder Installation:** and configuring the Splunk Universal Forwarder on a Windows Server VM to securely ship logs over port 9997.   
+
+**Data Input & Configuration Management:** Editing inputs.conf to target critical Windows Event Logs (Security, System, Application) and directing them into custom indexes (windows_logs).   
+
+**Splunk Processing Language (SPL) Authoring:** Writing and executing SPL queries to search, filter, transform, and analyze log data efficiently.  
+
+**Security Dashboard Construction:** Designing and building visual security dashboards featuring bar charts, line charts, and event lists to monitor authentication activity and system processes.   
+
+**Automated Alerting & Monitoring:** Creating scheduled alerts based on specific threshold conditions (such as high privileged logon counts) and configuring automated event logging.   
+
+**Security Incident Investigation:** Investigating failed login attempts, account lockouts (Event ID 4740), after-hours logons, and process creation events to spot potential brute-force or malicious activity. 
+
+## 💡 Lessons Learned
+ 
+- **A missing NSG rule is the first suspect for a connection timeout.** Port 8000 for the web UI and port 9997 for the forwarder both need explicit rules.
+- **Scope network exposure tightly.** SSH and the web UI are limited to my IP, and the forwarder port is limited to the VNet.
+- **Azure public IPs change when a VM is stopped and restarted.** Setting the assignment to Static avoids chasing a new IP every session.
+- **Put all lab VMs in one VNet with a subnet per environment.** It avoids VNet peering and keeps NSG management simple.
+- **Leave the Deployment Server blank in the Universal Forwarder installer.** Pointing it at the Splunk VM sends the forwarder to the wrong place and no data flows.
+- **Every `inputs.conf` stanza needs its `index` setting.** Without it, events go to the default `main` index and searches against `windows_logs` come back empty.
+- **A fresh VM has little to detect.** Generating test activity (failed logons, a lockout, service restarts) is what makes searches, dashboards, and alerts demonstrable.
+- **Alert thresholds need tuning.** Too broad causes alert fatigue, too narrow misses threats, so start with a baseline and adjust on false positives.
 
 
