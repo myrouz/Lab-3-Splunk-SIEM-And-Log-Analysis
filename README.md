@@ -16,7 +16,7 @@
 
 Follow along as I complete this lab! 
 
-<Insert Loom Link>
+[Loom Video: Splunk SIEM and Log Analysis Lab](https://www.loom.com/share/73ad5c648e6b4cf5b21741b42d2a606f)
  
 ## Table of Contents
  
