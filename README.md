@@ -164,31 +164,51 @@ Replace `<admin-username>` with the admin username set when creating the VM and 
 </details>
 
 <details>
-<summary><b>5. Install and start Splunk (Commands 1-4)</b></summary>
+<summary><b>5. Install and start Splunk (Commands 1-4)</b></summary
+                                                           
+Go to the [Splunk Enterprise Download page](https://www.splunk.com/en_us/download/splunk-enterprise.html) to get the latest version. You’ll need to create a free Splunk account (username and password) to download.
 
 Run these inside the SSH session, in order.
 
-**Command 1: Download the installer.** `wget` downloads a file, and `-O` sets the output filename.
+**Command 1: Download the installer.** 
+
+- Select your operating system (Linux) and click Copy wget link for the file type you prefer (.tgz or .deb).
+
+- The wget link is for Linux because we connected to the Ubuntu VM over SSH, so the download runs directly on the server instead of on your local machine.
+
+wget is a command-line download tool that comes preinstalled on most Ubuntu images. The -O flag sets the output filename, and the quoted URL is the direct download link from Splunk. This command downloads the Splunk .deb installer from Splunk’s servers and saves it in your current directory.
+
+`wget` downloads a file, and `-O` sets the output filename
 
 ```bash
 wget -O splunk-10.6.1.1-b2ae2962645c-linux-amd64.deb "https://download.splunk.com/products/splunk/releases/10.6.1.1/linux/splunk-10.6.1.1-b2ae2962645c-linux-amd64.deb"
 ```
 
-If this returns a 404, Splunk has released a newer version. Log into splunk.com, go to **Free Trials and Downloads**, select Linux `.deb`, and copy the `wget` command shown there.
+> Note: If this returns a 404 error, Splunk has released a newer version. Log in to splunk.com, go to Free Trials and Downloads, select Linux `.deb`, and copy the `wget` command shown on the download page.
 
-**Command 2: Install the package.** `dpkg -i` installs the package into `/opt/splunk/`. A warning about a missing Python 3.7 path is expected and harmless on Ubuntu 22.04.
+**Command 2: Install the package.** 
+
+`dpkg` the Debian/Ubuntu package manager, and the -i flag means install. sudo runs the command as root because installing software system-wide requires elevated permissions. This command unpacks the .deb file and installs Splunk into /opt/splunk/. You’ll see output for each installation step.
+
+`dpkg -i` installs the package into `/opt/splunk/`. A warning about a missing Python 3.7 path is expected and harmless on Ubuntu 22.04.
 
 ```bash
 sudo dpkg -i splunk-10.6.1.1-b2ae2962645c-linux-amd64.deb
 ```
 
-**Command 3: Start Splunk and accept the license.** `--run-as-root` is required on newer Splunk versions when running as root. You will be prompted to create an admin username and password for the web UI.
+> Note: You may see a warning about a missing Python 3.7 path. This is expected on Ubuntu 22.04 and harmless, because Splunk 10.x ships with its own Python.
+
+**Command 3: Start Splunk and accept the license.** 
+
+`--run-as-root` is required on newer Splunk versions when running as root. You will be prompted to create an admin username and password for the web UI. Save these, since you’ll use them to log in.
 
 ```bash
 sudo /opt/splunk/bin/splunk start --accept-license --run-as-root
 ```
 
-**Command 4: Enable start on boot.** Registers Splunk as a service so it restarts automatically with the VM.
+**Command 4: Enable start on boot.** 
+
+This command registers Splunk as a system service so it starts automatically whenever the VM reboots. Without it, you would need to SSH into the VM and run the start command manually after every restart.
 
 ```bash
 sudo /opt/splunk/bin/splunk enable boot-start
