@@ -312,11 +312,21 @@ Splunk is only as useful as the data it receives. The first data source is the W
 Do this in the Splunk web UI (`http://<YOUR_VM_PUBLIC_IP>:8000`) before installing the forwarder.
 
 1. Log into the Splunk web UI
-2. Click **Settings → Forwarding and Receiving**
+2. Click ⚙ **Settings** → Search **Forwarding and Receiving**
 3. Click **Configure Receiving → New Receiving Port**, enter `9997`, and click **Save**
-4. Click **Settings → Indexes → New Index**, name it `windows_logs`, and click **Save**
+4. Click ⚙ **Settings** → Search **Indexes** → Click **New Index**, name it `windows_logs`, and click **Save**
 
-<!-- Add screenshot: Settings > Forwarding and Receiving showing port 9997 enabled -->
+<img width="1409" height="694" alt="Splunk Forwarding and Receiving" src="https://github.com/user-attachments/assets/63b8c013-0f5c-4ff6-b449-d6de6966c4b0" />
+
+>Forward data (for sending data to other Splunk instances) and Receive data (for accepting data from forwarders). Because this Splunk server is the central SIEM and only needs to accept logs from the Windows VM, I use the Receive data section. Click + Add new next to Configure receiving to set up a listening port.
+
+<img width="1411" height="693" alt="Configure Receiving" src="https://github.com/user-attachments/assets/48bb140d-0d5a-4a6a-b44d-6d996c15cbb4" />
+
+> Enabling the receiving port. On the Configure receiving page, I entered 9997 in the Listen on this port field and clicked Save. Port 9997 is the standard TCP port Splunk uses for forwarder traffic. Once saved, Splunk listens on it, so the Universal Forwarder on the Windows VM can send its logs over the VNet peering to this server.
+
+<img width="1408" height="687" alt="Splunk Index Configuration" src="https://github.com/user-attachments/assets/77fdad8e-d02a-4a02-bd0f-0e26fdf2ea44" />
+
+> Creating the windows_logs events index to store logs from the Windows VM.
 
 </details>
 
@@ -327,7 +337,7 @@ Do this in the Splunk web UI (`http://<YOUR_VM_PUBLIC_IP>:8000`) before installi
 
 Do this on the **Windows Server VM**, not the Ubuntu VM.
 
-1. On the Windows VM, open a browser and go to [splunk.com/en_us/download/universal-forwarder.html](https://www.splunk.com/en_us/download/universal-forwarder.html), and log in with the same Splunk account used for the Enterprise download
+1. In the Windows VM, open a browser and go to [Splunk Universal Forwarder page](https://www.splunk.com/en_us/download/universal-forwarder.html), and log in with the same Splunk account used for the Enterprise download
 2. Download the **Windows 64-bit** `.msi` installer (the page also lists 32-bit and ARM versions)
 3. Run the installer and work through the screens:
 
@@ -349,11 +359,31 @@ Do this on the **Windows Server VM**, not the Ubuntu VM.
 
 `inputs.conf` tells the forwarder which Windows Event Logs to collect. The path must be exact:
 
+Open file explorer and navigate to the file path below: 
+
 ```text
-C:\Program Files\SplunkUniversalForwarder\etc\system\local\inputs.conf
+C:\Program Files\SplunkUniversalForwarder\etc\system\local
 ```
 
-Visual Studio Code is the easiest editor for this. Install it on the Windows VM from [code.visualstudio.com](https://code.visualstudio.com), then right-click the shortcut and choose **Run as Administrator** so it can save into Program Files. Create the `local` folder in Windows Explorer first if it does not exist, open it in VS Code with **File → Open Folder**, create a file named `inputs.conf`, paste the configuration below, and save with `Ctrl+S`.
+Create the `local` folder in Windows Explorer first if it does not exist.
+
+> Where the Universal Forwarder keeps its local configuration files on the Windows VM.
+> `outputs.conf` where to send it (the Ubuntu VM’s private IP on port 9997)
+> Create `inputs.conf` in this folder but first download Visual Studio Code
+
+Visual Studio Code is the easiest editor for this. Install it on the Windows VM from [Visual Studio Code page](https://code.visualstudio.com), then right-click the shortcut and choose **Run as Administrator** so it can save into Program Files. 
+
+`code .` is a command that opens Visual Studio Code with the current folder as the workspace. If you run it from a terminal that is in C:\Program Files\SplunkUniversalForwarder\etc\system\local, VS Code opens with that folder in the file explorer, so you can edit inputs.conf and outputs.conf there.
+
+<img width="1139" height="609" alt="Open Visual Code Splunk Forwarder local file path " src="https://github.com/user-attachments/assets/65a80514-2f11-4a66-9292-cf2ee914189c" />
+
+> Opening the Universal Forwarder local configuration folder in VS Code using `code .` from File Explorer.
+
+
+
+ open it in VS Code with **File → Open Folder**, create a file named `inputs.conf`, paste the configuration below, and save with `Ctrl+S`.
+
+
 
 ```ini
 # Each section in square brackets defines one log source to collect
