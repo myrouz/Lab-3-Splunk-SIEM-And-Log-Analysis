@@ -379,11 +379,11 @@ Visual Studio Code is the easiest editor for this. Install it on the Windows VM 
 
 > Opening the Universal Forwarder local configuration folder in VS Code using `code .` from File Explorer.
 
+<img width="1176" height="768" alt="Create inputs conf file" src="https://github.com/user-attachments/assets/ba92ada1-20b1-4ce8-ad8c-496d04d8e56d" />
 
+> Creating inputs.conf in the Universal Forwarder’s local folder using VS Code running as Administrator.
 
- open it in VS Code with **File → Open Folder**, create a file named `inputs.conf`, paste the configuration below, and save with `Ctrl+S`.
-
-
+Paste the configuration below, and save with `Ctrl+S`.
 
 ```ini
 # Each section in square brackets defines one log source to collect
@@ -427,10 +427,10 @@ Restart-Service SplunkForwarder
 
 A fresh Windows Server VM has mostly empty logs, so generate activity before running the searches. The script creates a temporary local user (`labtest.user`), generates failed and successful logins, service restarts, application events, and an account lockout, then deletes the user. It only creates events in the Windows Event Log; nothing is changed permanently.
 
-Open **PowerShell as Administrator** on the Windows VM and run the whole script (about 60-90 seconds).
+Open **PowerShell ISE as Administrator** on the Windows VM and run the whole script (about 60-90 seconds).
 
 <details>
-<summary><b>Click to expand: log generator script</b></summary>
+<summary><b>Click to expand: Log Generator Script</b></summary>
 
 ```powershell
 # Lab 3 Log Generator - run as Administrator on the Windows VM
@@ -529,6 +529,10 @@ Write-Host 'Done. Output saved to C:\lab3-log-output.txt' -ForegroundColor Green
 Write-Host 'Wait 60 seconds then search Splunk.' -ForegroundColor Green
 Write-Host '=============================================' -ForegroundColor Green
 ```
+
+<img width="1395" height="836" alt="Generate Log Data" src="https://github.com/user-attachments/assets/f7b2e5cc-61b4-4159-b853-051ab3f2131f" />
+
+> Executed a PowerShell script as Administrator on the Windows VM to generate simulated failed logon and account lockout events for ingestion into Splunk.
 
 </details>
 
